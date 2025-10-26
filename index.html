@@ -68,6 +68,20 @@ body[data-theme="light"] .content{background:linear-gradient(180deg,var(--panel-
 .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,0.12)}
 .card:hover .open{opacity:1;transform:translateY(0)}
 
+/* Coming Soon Card Styles */
+.card.coming-soon{background:linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));border:1px dashed rgba(37,99,235,0.3);position:relative;overflow:hidden}
+.card.coming-soon::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,0.1) 50%,transparent 60%);background-size:200% 200%;animation:shimmer 3s infinite linear}
+.card.coming-soon h4{color:var(--accent-2);display:flex;align-items:center;gap:8px}
+.card.coming-soon p{opacity:0.8;font-style:italic}
+.card.coming-soon .badge{position:absolute;top:12px;right:12px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.card.coming-soon:hover{transform:none;box-shadow:0 8px 25px rgba(37,99,235,0.15)}
+.card.coming-soon .open{display:none}
+
+@keyframes shimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+
 .tool-view{display:flex;flex-direction:column;gap:12px}
 .tool-header{display:flex;align-items:center;justify-content:space-between}
 .back-btn{background:transparent;border:0;color:inherit;cursor:pointer;font-weight:700}
@@ -273,7 +287,6 @@ body[data-theme="light"] .search-result-item:hover {
             <div class="card" data-tool="word-pdf"><div><h4>🧾 Word → PDF</h4><p>Convert .docx to PDF (Mammoth).</p></div><button class="open">Open</button></div>
             <div class="card" data-tool="excel-pdf"><div><h4>📊 Excel → PDF</h4><p>Convert first sheet to PDF.</p></div><button class="open">Open</button></div>
             <div class="card" data-tool="html-pdf"><div><h4>🌐 HTML → PDF</h4><p>Render HTML to PDF.</p></div><button class="open">Open</button></div>
-            <div class="card" data-tool="html-preview"><div><h4>🧭 HTML Previewer</h4><p>Live render and test HTML/CSS/JS.</p></div><button class="open">Open</button></div>
             
             <!-- New PDF Conversion Tools -->
             <div class="card" data-tool="pdf-excel"><div><h4>📊 PDF → Excel</h4><p>Extract tables from PDF to Excel format.</p></div><button class="open">Open</button></div>
@@ -289,6 +302,21 @@ body[data-theme="light"] .search-result-item:hover {
             <div class="card" data-tool="qr-gen"><div><h4>🔳 QR Generator</h4><p>Create PNG QR codes.</p></div><button class="open">Open</button></div>
             <div class="card" data-tool="qr-scan"><div><h4>📷 QR Scanner</h4><p>Scan QR codes with camera (HTTPS).</p></div><button class="open">Open</button></div>
             <div class="card" data-tool="text-case"><div><h4>🔠 Text Case Converter</h4><p>UPPER / lower / Title Case with download.</p></div><button class="open">Open</button></div>
+            
+            <!-- Coming Soon Card -->
+            <div class="card coming-soon">
+              <div class="badge">Coming Soon</div>
+              <div>
+                <h4>🚀 More Tools Coming</h4>
+                <p>We're working on exciting new features! Stay tuned for updates.</p>
+                <div style="margin-top:12px;font-size:12px;opacity:0.7">
+                  <div>• AI-powered tools</div>
+                  <div>• Advanced file converters</div>
+                  <div>• Collaboration features</div>
+                  <div>• And much more...</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -470,6 +498,8 @@ function showDashboard(onlyList){
   $('#toolContent').innerHTML = '';
   if(Array.isArray(onlyList) && onlyList.length){
     $$('.card').forEach(c => c.style.display = onlyList.includes(c.dataset.tool) ? 'block' : 'none');
+    // Always show the coming soon card when filtering
+    $$('.card.coming-soon').forEach(c => c.style.display = 'block');
   } else {
     $$('.card').forEach(c => c.style.display = 'block');
   }

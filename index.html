@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mice Tool Pro — Ultimate (19 tools)</title>
+
+<!-- Icons & libs -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Core libraries (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  }
+</script>
+
+<style>
+:root{
+  --bg-dark: #000000;
+  --bg-light: #ffffff;
+  --panel-dark: rgba(255,255,255,0.04);
+  --panel-strong-dark: rgba(255,255,255,0.06);
+  --panel-light: rgba(0,0,0,0.04);
+  --panel-strong-light: rgba(0,0,0,0.06);
+  --muted-dark: #98a0b3;
+  --muted-light: #3b4858;
+  --accent-1: #2563eb;
+  --accent-2: #7c3aed;
+  --glass-blur: 12px;
+  --radius: 12px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  --preview-height: 360px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:var(--font);-webkit-font-smoothing:antialiased}
+body[data-theme="dark"]{background:var(--bg-dark);color:var(--muted-dark)}
+body[data-theme="light"]{background:var(--bg-light);color:var(--muted-light)}
+
+.app{max-width:1200px;margin:20px auto;padding:18px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
+.brand{display:flex;gap:12px;align-items:center;font-weight:800;font-size:18px;color:var(--accent-1)}
+.header-right{display:flex;gap:10px;align-items:center}
+.main{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:start}
+.sidebar{border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;align-items:center;height:calc(100vh - 140px);transition:width .18s}
+body[data-theme="dark"] .sidebar{background:var(--panel-dark);backdrop-filter:blur(var(--glass-blur))}
+body[data-theme="light"] .sidebar{background:var(--panel-light);backdrop-filter:blur(6px)}
+.icon-btn{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;cursor:pointer;color:inherit}
+.icon-btn.active{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;box-shadow:0 8px 20px rgba(37,99,235,0.12);transform:translateY(-6px)}
+.collapse-toggle{margin-top:auto}
+
+.content{min-height:520px;padding:18px;border-radius:12px;transition:box-shadow .18s}
+body[data-theme="dark"] .content{background:linear-gradient(180deg,var(--panel-dark),var(--panel-strong-dark));backdrop-filter:blur(var(--glass-blur))}
+body[data-theme="light"] .content{background:linear-gradient(180deg,var(--panel-light),var(--panel-strong-light));backdrop-filter:blur(6px)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{border-radius:12px;padding:18px;border:1px solid rgba(0,0,0,0.04);backdrop-filter:blur(var(--glass-blur));transition:transform .22s,box-shadow .22s;min-height:120px;position:relative;overflow:hidden}
+.card h4{margin:0;color:var(--accent-1);font-size:16px}
+.card p{margin:0;color:inherit;font-size:13px;opacity:.9}
+.card .open{position:absolute;right:12px;bottom:12px;padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;cursor:pointer;opacity:0;transform:translateY(6px);transition:all .18s}
+.card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,0.12)}
+.card:hover .open{opacity:1;transform:translateY(0)}
+
+.tool-view{display:flex;flex-direction:column;gap:12px}
+.tool-header{display:flex;align-items:center;justify-content:space-between}
+.back-btn{background:transparent;border:0;color:inherit;cursor:pointer;font-weight:700}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:inherit}
+textarea{min-height:160px;resize:vertical}
+.small{font-size:13px;opacity:.95}
+.footer{margin-top:16px;text-align:center;font-size:13px;opacity:.8}
+.theme-toggle{display:flex;align-items:center;gap:8px;padding:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:0;cursor:pointer;box-shadow:0 6px 18px rgba(37,99,235,0.12)}
+
+.preview { margin-top:12px; border-radius:8px; padding:10px; background:rgba(0,0,0,0.03); }
+.preview .label { font-weight:700; margin-bottom:8px; color:var(--accent-1); }
+.preview iframe, .preview img, .preview video, .preview canvas, .preview audio { width:100%; border-radius:6px; display:block; background:white; }
+
+body[data-theme="dark"] .preview { background: rgba(255,255,255,0.02); }
+body[data-theme="light"] .preview { background: rgba(0,0,0,0.02); }
+
+/* Search Bar Styles */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 300px;
+  margin-right: 12px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.05);
+  color: inherit;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+body[data-theme="dark"] .search-input {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+body[data-theme="light"] .search-input {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--muted-dark);
+  pointer-events: none;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--panel-dark);
+  border-radius: 8px;
+  margin-top: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  backdrop-filter: blur(var(--glass-blur));
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+}
+
+body[data-theme="light"] .search-results {
+  background: var(--panel-light);
+}
+
+.search-result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-theme="dark"] .search-result-item {
+  border-bottom-color: rgba(255,255,255,0.05);
+}
+
+.search-result-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+body[data-theme="light"] .search-result-item:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.search-result-title {
+  font-weight: 600;
+  color: var(--accent-1);
+  margin-bottom: 4px;
+}
+
+.search-result-desc {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+@media (max-width:980px){
+  .main{grid-template-columns:1fr}
+  .sidebar{flex-direction:row;height:auto;padding:8px;border-radius:10px;overflow:auto}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  
+  .search-container {
+    max-width: 200px;
+    margin-right: 8px;
+  }
+}
+
+@media (max-width:768px){
+  .search-container {
+    max-width: 180px;
+  }
+  
+  .search-input {
+    padding: 8px 12px 8px 36px;
+    font-size: 13px;
+  }
+  
+  .search-icon {
+    left: 12px;
+  }
+}
+
+@media (max-width:640px){
+  .search-container {
+    max-width: 160px;
+  }
+}
+
+@media (max-width:480px){
+  .search-container {
+    max-width: 140px;
+  }
+}
+</style>
+</head>
+<body data-theme="dark">
+  <div class="app">
+    <div class="header">
+      <div class="brand"><i class="fas fa-mouse-pointer"></i> Mice Tool Pro — Ultimate</div>
+      <div class="header-right">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search tools...">
+          <div class="search-results" id="searchResults"></div>
+        </div>
+        <button id="themeToggle" class="theme-toggle"><i id="themeIcon" class="fas fa-moon"></i> Theme</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="sidebar" id="sidebar">
+        <button class="icon-btn active" data-target="dashboard" id="sb-dashboard" title="Dashboard"><i class="fas fa-th-large"></i></button>
+        <button class="icon-btn" data-target="image" id="sb-image" title="Image Tools"><i class="fas fa-image"></i></button>
+        <button class="icon-btn" data-target="pdf" id="sb-pdf" title="PDF Tools"><i class="fas fa-file-pdf"></i></button>
+        <button class="icon-btn" data-target="media" id="sb-media" title="Media Tools"><i class="fas fa-film"></i></button>
+        <button class="icon-btn" data-target="audio" id="sb-audio" title="Audio Tools"><i class="fas fa-music"></i></button>
+        <button class="icon-btn" data-target="qr" id="sb-qr" title="QR & Utilities"><i class="fas fa-qrcode"></i></button>
+        <button class="icon-btn collapse-toggle" id="sb-collapse" title="Toggle sidebar"><i class="fas fa-chevron-left"></i></button>
+      </div>
+
+      <div class="content" id="content">
+        <div id="dashboardView">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <h2 style="margin:0;color:var(--accent-1)">Welcome — Mice Tool Pro</h2>
+            <div class="small">All tools run locally — previews appear below each tool's inputs.</div>
+          </div>
+
+          <div class="grid" id="cardGrid">
+            <!-- Image -->
+            <div class="card" data-tool="image-compress"><div><h4>🖼️ Image Compressor</h4><p>Compress and resize images in the browser.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="image-format"><div><h4>🖼️ Image Format Converter</h4><p>Convert PNG ↔ JPG ↔ WebP.</p></div><button class="open">Open</button></div>
+
+            <!-- PDF -->
+            <div class="card" data-tool="pdf-compress"><div><h4>📄 PDF Compressor</h4><p>Client-side re-save & estimate compression.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="merge-pdf"><div><h4>📚 Merge PDFs</h4><p>Combine PDFs locally.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="split-pdf"><div><h4>✂️ Split PDF</h4><p>Extract pages or ranges.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="unlock-pdf"><div><h4>🔓 Unlock PDF</h4><p>Provide password to unlock (renders pages).</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="text-pdf"><div><h4>📝 Text → PDF</h4><p>Convert plain text to PDF.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="word-pdf"><div><h4>🧾 Word → PDF</h4><p>Convert .docx to PDF (Mammoth).</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="excel-pdf"><div><h4>📊 Excel → PDF</h4><p>Convert first sheet to PDF.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="html-pdf"><div><h4>🌐 HTML → PDF</h4><p>Render HTML to PDF.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="html-preview"><div><h4>🧭 HTML Previewer</h4><p>Live render and test HTML/CSS/JS.</p></div><button class="open">Open</button></div>
+            
+            <!-- New PDF Conversion Tools -->
+            <div class="card" data-tool="pdf-excel"><div><h4>📊 PDF → Excel</h4><p>Extract tables from PDF to Excel format.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="pdf-word"><div><h4>📝 PDF → Word</h4><p>Convert PDF to editable Word document.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="pdf-ppt"><div><h4>📑 PDF → PowerPoint</h4><p>Convert PDF to PowerPoint presentation.</p></div><button class="open">Open</button></div>
+
+            <!-- Media -->
+            <div class="card" data-tool="video-compress"><div><h4>🎥 Video Compressor</h4><p>Simulated/Lightweight compressor & preview.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="video-cropper"><div><h4>🎥 Video Cropper</h4><p>Crop a rectangular region and export cropped video (WebM).</p></div><button class="open">Open</button></div>
+
+            <!-- Audio & QR -->
+            <div class="card" data-tool="audio-trim"><div><h4>🎧 Audio Trimmer</h4><p>Trim MP3/WAV in-browser (WebAudio).</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="qr-gen"><div><h4>🔳 QR Generator</h4><p>Create PNG QR codes.</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="qr-scan"><div><h4>📷 QR Scanner</h4><p>Scan QR codes with camera (HTTPS).</p></div><button class="open">Open</button></div>
+            <div class="card" data-tool="text-case"><div><h4>🔠 Text Case Converter</h4><p>UPPER / lower / Title Case with download.</p></div><button class="open">Open</button></div>
+          </div>
+        </div>
+
+        <div id="toolView" style="display:none" class="tool-view card">
+          <div class="tool-header">
+            <div style="display:flex;gap:12px;align-items:center">
+              <button class="back-btn" id="backToDash"><i class="fas fa-chevron-left"></i> Back</button>
+              <h3 id="toolTitle" style="margin:0;color:var(--accent-1)"></h3>
+            </div>
+            <div class="small" id="toolSub"></div>
+          </div>
+          <div id="toolContent"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">© 2025 Mice Tool Pro — Ultimate</div>
+  </div>
+
+<script>
+/* ---------- Utilities ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function downloadBlob(blob, filename){ const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000); }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtBytes(b){ if(!b && b !== 0) return '—'; if(b < 1024) return b+' B'; if(b < 1048576) return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(2)+' MB'; }
+
+/* Search functionality */
+const searchInput = $('#searchInput');
+const searchResults = $('#searchResults');
+
+// Tool data for search
+const toolData = [
+  { id: 'image-compress', title: 'Image Compressor', description: 'Compress and resize images in the browser', icon: '🖼️' },
+  { id: 'image-format', title: 'Image Format Converter', description: 'Convert PNG ↔ JPG ↔ WebP', icon: '🖼️' },
+  { id: 'pdf-compress', title: 'PDF Compressor', description: 'Client-side re-save & estimate compression', icon: '📄' },
+  { id: 'merge-pdf', title: 'Merge PDFs', description: 'Combine PDFs locally', icon: '📚' },
+  { id: 'split-pdf', title: 'Split PDF', description: 'Extract pages or ranges', icon: '✂️' },
+  { id: 'unlock-pdf', title: 'Unlock PDF', description: 'Provide password to unlock (renders pages)', icon: '🔓' },
+  { id: 'text-pdf', title: 'Text → PDF', description: 'Convert plain text to PDF', icon: '📝' },
+  { id: 'word-pdf', title: 'Word → PDF', description: 'Convert .docx to PDF (Mammoth)', icon: '🧾' },
+  { id: 'excel-pdf', title: 'Excel → PDF', description: 'Convert first sheet to PDF', icon: '📊' },
+  { id: 'html-pdf', title: 'HTML → PDF', description: 'Render HTML to PDF', icon: '🌐' },
+  { id: 'html-preview', title: 'HTML Previewer', description: 'Live render and test HTML/CSS/JS', icon: '🧭' },
+  { id: 'pdf-excel', title: 'PDF → Excel', description: 'Extract tables from PDF to Excel format', icon: '📊' },
+  { id: 'pdf-word', title: 'PDF → Word', description: 'Convert PDF to editable Word document', icon: '📝' },
+  { id: 'pdf-ppt', title: 'PDF → PowerPoint', description: 'Convert PDF to PowerPoint presentation', icon: '📑' },
+  { id: 'video-compress', title: 'Video Compressor', description: 'Simulated/Lightweight compressor & preview', icon: '🎥' },
+  { id: 'video-cropper', title: 'Video Cropper', description: 'Crop a rectangular region and export cropped video (WebM)', icon: '🎥' },
+  { id: 'audio-trim', title: 'Audio Trimmer', description: 'Trim MP3/WAV in-browser (WebAudio)', icon: '🎧' },
+  { id: 'qr-gen', title: 'QR Generator', description: 'Create PNG QR codes', icon: '🔳' },
+  { id: 'qr-scan', title: 'QR Scanner', description: 'Scan QR codes with camera (HTTPS)', icon: '📷' },
+  { id: 'text-case', title: 'Text Case Converter', description: 'UPPER / lower / Title Case with download', icon: '🔠' }
+];
+
+// Search function
+function performSearch(query) {
+  if (!query.trim()) {
+    searchResults.style.display = 'none';
+    return;
+  }
+  
+  const lowercaseQuery = query.toLowerCase();
+  const results = toolData.filter(tool => 
+    tool.title.toLowerCase().includes(lowercaseQuery) || 
+    tool.description.toLowerCase().includes(lowercaseQuery)
+  );
+  
+  displaySearchResults(results);
+}
+
+// Display search results
+function displaySearchResults(results) {
+  if (results.length === 0) {
+    searchResults.innerHTML = '<div class="no-results">No tools found</div>';
+    searchResults.style.display = 'block';
+    return;
+  }
+  
+  searchResults.innerHTML = '';
+  results.forEach(tool => {
+    const resultItem = document.createElement('div');
+    resultItem.className = 'search-result-item';
+    resultItem.innerHTML = `
+      <div class="search-result-title">${tool.icon} ${tool.title}</div>
+      <div class="search-result-desc">${tool.description}</div>
+    `;
+    resultItem.addEventListener('click', () => {
+      openTool(tool.id);
+      searchInput.value = '';
+      searchResults.style.display = 'none';
+    });
+    searchResults.appendChild(resultItem);
+  });
+  
+  searchResults.style.display = 'block';
+}
+
+// Event listeners for search
+searchInput.addEventListener('input', (e) => {
+  performSearch(e.target.value);
+});
+
+searchInput.addEventListener('focus', () => {
+  if (searchResults.innerHTML) {
+    searchResults.style.display = 'block';
+  }
+});
+
+// Close search results when clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+    searchResults.style.display = 'none';
+  }
+});
+
+/* theme */
+const body = document.body;
+const themeToggle = $('#themeToggle');
+function applyTheme(theme){
+  body.setAttribute('data-theme', theme);
+  $('#themeIcon').className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  localStorage.setItem('mice_theme', theme);
+  if(theme === 'dark') document.documentElement.style.setProperty('--bg-dark', '#000000');
+  else document.documentElement.style.setProperty('--bg-light', '#ffffff');
+}
+applyTheme(localStorage.getItem('mice_theme') || 'dark');
+themeToggle.addEventListener('click', ()=> applyTheme(body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+/* sidebar collapse */
+$('#sb-collapse').addEventListener('click', ()=> {
+  const sidebar = $('#sidebar');
+  if(window.innerWidth > 980){
+    const collapsed = sidebar.style.width === '56px';
+    sidebar.style.width = collapsed ? '72px' : '56px';
+    $('#sb-collapse i').classList.toggle('fa-chevron-right', !collapsed);
+  } else {
+    sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+  }
+});
+
+/* wire cards */
+function wireCards(){
+  $$('.card').forEach(card => {
+    const openBtn = card.querySelector('.open');
+    const tool = card.dataset.tool;
+    if(openBtn) openBtn.addEventListener('click', ()=> openTool(tool));
+    card.addEventListener('dblclick', ()=> openTool(tool));
+  });
+}
+wireCards();
+
+/* sidebar filter */
+$$('.icon-btn[data-target]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('.icon-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const t = btn.dataset.target;
+    if(t === 'dashboard'){ showDashboard(); return; }
+    const map = {
+      image: ['image-compress','image-format'],
+      pdf: ['pdf-compress','merge-pdf','split-pdf','unlock-pdf','text-pdf','word-pdf','excel-pdf','html-pdf','html-preview','pdf-excel','pdf-word','pdf-ppt'],
+      media: ['video-compress','video-cropper','audio-trim','html-preview'],
+      audio: ['audio-trim'],
+      qr: ['qr-gen','qr-scan','text-case'],
+    };
+    showDashboard(map[t] || []);
+  });
+});
+
+/* back */
+$('#backToDash').addEventListener('click', ()=> showDashboard());
+
+function showDashboard(onlyList){
+  $('#toolView').style.display = 'none';
+  $('#dashboardView').style.display = 'block';
+  $('#toolTitle').textContent = '';
+  $('#toolContent').innerHTML = '';
+  if(Array.isArray(onlyList) && onlyList.length){
+    $$('.card').forEach(c => c.style.display = onlyList.includes(c.dataset.tool) ? 'block' : 'none');
+  } else {
+    $$('.card').forEach(c => c.style.display = 'block');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* dispatcher */
+function openTool(key){
+  stopScanner();
+  $('#dashboardView').style.display = 'none';
+  $('#toolView').style.display = 'block';
+  $('#toolContent').innerHTML = '<div class="small">Loading tool…</div>';
+  let title = '';
+  try{
+    switch(key){
+      case 'image-compress': title='Image Compressor'; renderImageCompressor(); break;
+      case 'image-format': title='Image Format Converter'; renderImageFormatConverter(); break;
+      case 'pdf-compress': title='PDF Compressor'; renderPdfCompressor(); break;
+      case 'merge-pdf': title='Merge PDFs'; renderMergePdfs(); break;
+      case 'split-pdf': title='Split PDF'; renderSplitPdf(); break;
+      case 'unlock-pdf': title='Unlock PDF'; renderUnlockPdf(); break;
+      case 'text-pdf': title='Text → PDF'; renderTextToPdf(); break;
+      case 'word-pdf': title='Word → PDF'; renderWordToPdf(); break;
+      case 'excel-pdf': title='Excel → PDF'; renderExcelToPdf(); break;
+      case 'html-pdf': title='HTML → PDF'; renderHtmlToPdf(); break;
+      case 'html-preview': title='HTML Previewer'; renderHtmlPreview(); break;
+      case 'pdf-excel': title='PDF → Excel'; renderPdfToExcel(); break;
+      case 'pdf-word': title='PDF → Word'; renderPdfToWord(); break;
+      case 'pdf-ppt': title='PDF → PowerPoint'; renderPdfToPowerPoint(); break;
+      case 'video-compress': title='Video Compressor'; renderVideoCompressor(); break;
+      case 'video-cropper': title='Video Cropper'; renderVideoCropper(); break;
+      case 'audio-trim': title='Audio Trimmer'; renderAudioTrimmer(); break;
+      case 'qr-gen': title='QR Generator'; renderQrGenerator(); break;
+      case 'qr-scan': title='QR Scanner'; renderQrScanner(); break;
+      case 'text-case': title='Text Case Converter'; renderTextCaseConverter(); break;
+      default: $('#toolContent').innerHTML = '<div>Tool not implemented</div>';
+    }
+    $('#toolTitle').textContent = title;
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(err){
+    console.error(err);
+    $('#toolContent').innerHTML = `<div class="small">Error: ${escapeHtml(String(err))}</div>`;
+  }
+}
+
+/* small button style */
+const smallButtonStyle = 'padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;cursor:pointer';
+
+/* --------------------- TOOL IMPLEMENTATIONS --------------------- */
+
+/* IMAGE: Compressor */
+function renderImageCompressor(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Compress & resize images (client-side). Preview below.</div>
+      <input type="file" id="imgFileTool" accept="image/*">
+      <label>Quality: <span id="imgQlabel">80%</span></label>
+      <input type="range" id="imgQualityTool" min="10" max="100" value="80">
+      <div class="controls"><button id="imgProcessBtn" style="${smallButtonStyle}">Process</button><button id="imgDownloadBtn" class="btn ghost">Download</button><button id="imgResetBtn" class="btn ghost">Reset</button></div>
+      <div class="preview" id="imgPreviewArea">
+        <div class="label">Preview</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px"><div class="small">Original</div><img id="imgOriginalPreview" style="max-width:100%;border-radius:6px;margin-top:8px"></div>
+          <div style="flex:1;min-width:200px"><div class="small">Processed</div><img id="imgProcessedPreview" style="max-width:100%;border-radius:6px;margin-top:8px"></div>
+        </div>
+        <div style="margin-top:8px" id="imgSizes" class="small"></div>
+      </div>
+    </div>`;
+  let original=null, processed=null;
+  $('#imgQualityTool').addEventListener('input', e=> $('#imgQlabel').textContent = e.target.value + '%');
+  $('#imgFileTool').addEventListener('change', e=>{
+    original = e.target.files && e.target.files[0];
+    if(original){
+      $('#imgOriginalPreview').src = URL.createObjectURL(original);
+      $('#imgProcessedPreview').src = '';
+      $('#imgSizes').textContent = `Original size: ${fmtBytes(original.size)}`;
+      processed = null;
+    }
+  });
+  $('#imgProcessBtn').addEventListener('click', async ()=>{
+    if(!original) return alert('Select an image first');
+    const q = Math.max(0.05, parseInt($('#imgQualityTool').value,10)/100);
+    const dataUrl = await new Promise(r=>{ const fr=new FileReader(); fr.onload=e=>r(e.target.result); fr.readAsDataURL(original); });
+    const img = new Image(); img.src = dataUrl; await new Promise(r=> img.onload = r);
+    let [w,h] = [img.naturalWidth, img.naturalHeight]; const max = 2000; const maxSide = Math.max(w,h);
+    if(maxSide > max){ const ratio = max / maxSide; w = Math.round(w*ratio); h = Math.round(h*ratio); }
+    const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+    await new Promise(res=> canvas.toBlob(b=>{ processed = b; $('#imgProcessedPreview').src = URL.createObjectURL(b); $('#imgSizes').textContent = `Original: ${fmtBytes(original.size)} — Processed: ${fmtBytes(b.size)} — Saved: ${original.size ? (((original.size - b.size)/original.size)*100).toFixed(1) + '%' : '—'}`; res(); }, 'image/jpeg', q));
+  });
+  $('#imgDownloadBtn').addEventListener('click', ()=> { if(!processed) return alert('Process first'); downloadBlob(processed, `image_${Date.now()}.jpg`); });
+  $('#imgResetBtn').addEventListener('click', ()=> { renderImageCompressor(); });
+}
+
+/* IMAGE: Format Converter */
+function renderImageFormatConverter(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert PNG ↔ JPG ↔ WebP. Preview below.</div>
+      <input type="file" id="imgConvFile" accept="image/*">
+      <label>To:</label>
+      <select id="imgConvFormat"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select>
+      <div class="controls"><button id="imgConvRun" style="${smallButtonStyle}">Convert</button><button id="imgConvDL" class="btn ghost">Download</button></div>
+      <div class="preview" id="imgConvPreviewArea">
+        <div class="label">Converted Preview</div>
+        <div id="imgConvPreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  let converted = null;
+  $('#imgConvRun').addEventListener('click', ()=>{
+    const f = $('#imgConvFile').files && $('#imgConvFile').files[0]; if(!f) return alert('Select image');
+    const format = $('#imgConvFormat').value;
+    const fr = new FileReader(); fr.onload = e => {
+      const img = new Image();
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext('2d').drawImage(img,0,0);
+        canvas.toBlob(b=>{ converted=b; $('#imgConvPreviewInner').innerHTML = `<div class="small">${format.split('/')[1]} — ${fmtBytes(b.size)}</div><img src="${URL.createObjectURL(b)}" style="max-width:100%;margin-top:8px;border-radius:6px">`; }, format, 0.9);
+      };
+      img.src = e.target.result;
+    };
+    fr.readAsDataURL(f);
+  });
+  $('#imgConvDL').addEventListener('click', ()=> { if(!converted) return alert('Convert first'); const ext = $('#imgConvFormat').value.split('/')[1]; downloadBlob(converted, `converted.${ext}`); });
+}
+
+/* PDF: Compressor */
+function renderPdfCompressor(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Client-side re-save of PDF. Preview below (click Compress then view result).</div>
+      <input type="file" id="pdfCompressFile" accept="application/pdf">
+      <div class="controls"><button id="pdfCompressRun" style="${smallButtonStyle}">Compress</button></div>
+      <div class="preview" id="pdfCompressPreview">
+        <div class="label">PDF Preview (result)</div>
+        <div id="pdfCompressPreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  $('#pdfCompressRun').addEventListener('click', async ()=>{
+    const f = $('#pdfCompressFile').files && $('#pdfCompressFile').files[0]; if(!f) return alert('Select PDF');
+    try{
+      const buf = await f.arrayBuffer();
+      const { PDFDocument } = PDFLib;
+      const doc = await PDFDocument.load(buf);
+      const out = await doc.save({ useObjectStreams: true });
+      const blob = new Blob([out], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      $('#pdfCompressPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Estimated size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="pdfCompressDL" class="btn ghost">Download Result</button></div>`;
+      $('#pdfCompressDL').addEventListener('click', ()=> downloadBlob(blob, `compressed_${Date.now()}.pdf`));
+    } catch(e){ console.error(e); alert('Compress failed'); }
+  });
+}
+
+/* PDF: Merge */
+function renderMergePdfs(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Select multiple PDFs — order preserved. Preview after merging.</div>
+      <input type="file" id="mergeFilesInput" accept="application/pdf" multiple>
+      <div class="controls"><button id="mergeRun" style="${smallButtonStyle}">Merge</button></div>
+      <div class="preview" id="mergePreview">
+        <div class="label">Merged PDF Preview</div>
+        <div id="mergePreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  $('#mergeRun').addEventListener('click', async ()=>{
+    const files = Array.from($('#mergeFilesInput').files || []);
+    if(!files.length) return alert('Select PDFs');
+    try{
+      const { PDFDocument } = PDFLib;
+      const merged = await PDFDocument.create();
+      for(let i=0;i<files.length;i++){
+        const buf = await files[i].arrayBuffer();
+        const pdf = await PDFDocument.load(buf);
+        const pages = await merged.copyPages(pdf, pdf.getPageIndices());
+        pages.forEach(p=> merged.addPage(p));
+      }
+      const out = await merged.save();
+      const blob = new Blob([out], { type:'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      $('#mergePreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Merged size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="mergeDL" class="btn ghost">Download</button></div>`;
+      $('#mergeDL').addEventListener('click', ()=> downloadBlob(blob, `merged_${Date.now()}.pdf`));
+    } catch(e){ console.error(e); alert('Merge failed'); }
+  });
+}
+
+/* PDF: Split */
+function renderSplitPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Extract a page or range (e.g., "1" or "2-4"). Preview below after splitting.</div>
+      <input type="file" id="splitPdfFile" accept="application/pdf">
+      <input type="text" id="splitRange" placeholder="1 or 2-4">
+      <div class="controls"><button id="splitRun" style="${smallButtonStyle}">Split</button></div>
+      <div class="preview" id="splitPreview"><div class="label">Split PDF Preview</div><div id="splitPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#splitRun').addEventListener('click', async ()=>{
+    const f = $('#splitPdfFile').files && $('#splitPdfFile').files[0]; if(!f) return alert('Select PDF');
+    const r = $('#splitRange').value.trim(); if(!r) return alert('Enter range');
+    const parse = s => s.includes('-') ? s.split('-').map(x=>parseInt(x,10)) : [parseInt(s,10), parseInt(s,10)];
+    const [start,end] = parse(r);
+    try{
+      const buf = await f.arrayBuffer();
+      const { PDFDocument } = PDFLib;
+      const src = await PDFDocument.load(buf);
+      const total = src.getPageCount();
+      if(start<1 || end>total || start> end) return alert(`Invalid range. PDF has ${total} pages`);
+      const outDoc = await PDFDocument.create();
+      const pages = await outDoc.copyPages(src, Array.from({length:end-start+1}, (_,i)=> start-1+i));
+      pages.forEach(p=> outDoc.addPage(p));
+      const blob = new Blob([await outDoc.save()], { type:'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      $('#splitPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="splitDL" class="btn ghost">Download</button></div>`;
+      $('#splitDL').addEventListener('click', ()=> downloadBlob(blob, `split_${start}-${end}.pdf`));
+    } catch(e){ console.error(e); alert('Split failed'); }
+  });
+}
+
+/* PDF: Unlock */
+function renderUnlockPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">If file is password-protected supply password. Result preview shown below.</div>
+      <input type="file" id="unlockFileInput" accept="application/pdf">
+      <input type="password" id="unlockPassInput" placeholder="Password (if any)">
+      <div class="controls"><button id="unlockRun" style="${smallButtonStyle}">Unlock</button></div>
+      <div class="preview" id="unlockPreview"><div class="label">Unlocked PDF Preview</div><div id="unlockPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#unlockRun').addEventListener('click', async ()=>{
+    const f = $('#unlockFileInput').files && $('#unlockFileInput').files[0]; if(!f) return alert('Select PDF');
+    const pass = $('#unlockPassInput').value || undefined;
+    if(!window.pdfjsLib){ alert('pdf.js is required'); return; }
+    try{
+      const buf = await f.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: buf, password: pass });
+      const pdf = await loadingTask.promise;
+      const { jsPDF } = window.jspdf;
+      const out = new jsPDF({ unit:'pt', format:'a4' });
+      for(let i=1;i<=pdf.numPages;i++){
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        if(i>1) out.addPage();
+        const pw = out.internal.pageSize.getWidth(), ph = out.internal.pageSize.getHeight();
+        const props = out.getImageProperties(imgData);
+        const ratio = props.width / props.height;
+        let drawW = pw, drawH = drawW / ratio;
+        if(drawH > ph){ drawH = ph; drawW = drawH * ratio; }
+        out.addImage(imgData, 'JPEG', (pw-drawW)/2, (ph-drawH)/2, drawW, drawH);
+      }
+      const blob = out.output('blob');
+      const url = URL.createObjectURL(blob);
+      $('#unlockPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Unlocked preview ready.</div><div style="margin-top:6px"><button id="unlockDL" class="btn ghost">Download</button></div>`;
+      $('#unlockDL').addEventListener('click', ()=> downloadBlob(blob, `unlocked_${Date.now()}.pdf`));
+    } catch(e){ console.error(e); alert('Unlock failed — wrong password or unsupported encryption'); }
+  });
+}
+
+/* Text -> PDF */
+function renderTextToPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Paste text — will be laid out into PDF pages. Preview below.</div>
+      <textarea id="textToPdfInput" rows="12"></textarea>
+      <div class="controls"><button id="textToPdfRun" style="${smallButtonStyle}">Generate PDF</button></div>
+      <div class="preview" id="textPdfPreview"><div class="label">Generated PDF Preview</div><div id="textPdfPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#textToPdfRun').addEventListener('click', ()=>{
+    const t = $('#textToPdfInput').value; if(!t.trim()) return alert('Enter text');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    const margin = 40; const pageW = doc.internal.pageSize.getWidth() - margin*2;
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize(t, pageW);
+    let y = margin;
+    for(const line of lines){
+      if(y > doc.internal.pageSize.getHeight() - margin){ doc.addPage(); y = margin; }
+      doc.text(line, margin, y); y += 16;
+    }
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    $('#textPdfPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Generated size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="textPdfDL" class="btn ghost">Download</button></div>`;
+    $('#textPdfDL').addEventListener('click', ()=> downloadBlob(blob, `text_${Date.now()}.pdf`));
+  });
+}
+
+/* Word -> PDF */
+function renderWordToPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert .docx using Mammoth. Preview below (PDF rendered).</div>
+      <input type="file" id="wordFileInput" accept=".docx">
+      <div class="controls"><button id="wordRun" style="${smallButtonStyle}">Convert</button></div>
+      <div class="preview" id="wordPreview"><div class="label">Word → PDF Preview</div><div id="wordPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#wordRun').addEventListener('click', async ()=>{
+    const f = $('#wordFileInput').files && $('#wordFileInput').files[0]; if(!f) return alert('Select .docx');
+    try{
+      const ab = await f.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer: ab });
+      const html = result.value;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      await doc.html(html, { x:20, y:20, width: doc.internal.pageSize.getWidth()-40 });
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      $('#wordPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Converted size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="wordDL" class="btn ghost">Download</button></div>`;
+      $('#wordDL').addEventListener('click', ()=> downloadBlob(blob, `word_${Date.now()}.pdf`));
+    } catch(e){ console.error(e); alert('Conversion failed'); }
+  });
+}
+
+/* Excel -> PDF */
+function renderExcelToPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert first sheet to PDF. Preview below.</div>
+      <input type="file" id="excelFileInput" accept=".xls,.xlsx">
+      <div class="controls"><button id="excelRun" style="${smallButtonStyle}">Convert</button></div>
+      <div class="preview" id="excelPreview"><div class="label">Excel → PDF Preview</div><div id="excelPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#excelRun').addEventListener('click', async ()=>{
+    const f = $('#excelFileInput').files && $('#excelFileInput').files[0]; if(!f) return alert('Select Excel file');
+    try{
+      const ab = await f.arrayBuffer();
+      const wb = XLSX.read(ab, { type:'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const html = XLSX.utils.sheet_to_html(ws);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4', orientation:'landscape' });
+      await doc.html(html, { x:20, y:20, width: doc.internal.pageSize.getWidth()-40 });
+      const blob = doc.output('blob'); const url = URL.createObjectURL(blob);
+      $('#excelPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Converted size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="excelDL" class="btn ghost">Download</button></div>`;
+      $('#excelDL').addEventListener('click', ()=> downloadBlob(blob, `excel_${Date.now()}.pdf`));
+    } catch(e){ console.error(e); alert('Excel conversion failed'); }
+  });
+}
+
+/* HTML -> PDF */
+function renderHtmlToPdf(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Render HTML to PDF. Preview below.</div>
+      <textarea id="htmlToPdfInput" rows="12"></textarea>
+      <div class="controls"><button id="htmlToPdfRun" style="${smallButtonStyle}">Convert</button></div>
+      <div class="preview" id="htmlPdfPreview"><div class="label">HTML → PDF Preview</div><div id="htmlPdfPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  $('#htmlToPdfRun').addEventListener('click', async ()=>{
+    const html = $('#htmlToPdfInput').value; if(!html.trim()) return alert('Paste HTML first');
+    try{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      const container = document.createElement('div'); container.style.width = '800px'; container.innerHTML = html;
+      await doc.html(container, { callback: d => {
+        const blob = d.output('blob'); const url = URL.createObjectURL(blob);
+        $('#htmlPdfPreviewInner').innerHTML = `<iframe src="${url}" style="height:var(--preview-height);border:0;border-radius:6px"></iframe><div style="margin-top:8px" class="small">Generated size: ${fmtBytes(blob.size)}</div><div style="margin-top:6px"><button id="htmlPdfDL" class="btn ghost">Download</button></div>`;
+        $('#htmlPdfDL').addEventListener('click', ()=> downloadBlob(blob, `html_${Date.now()}.pdf`));
+      }, x:20, y:20, width: doc.internal.pageSize.getWidth()-40 });
+    } catch(e){ console.error(e); alert('HTML → PDF failed'); }
+  });
+}
+
+/* HTML Previewer */
+function renderHtmlPreview(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Live editor with sandboxed preview. Preview below (live iframe).</div>
+      <div style="display:flex;gap:8px"><button id="previewUpdate" style="${smallButtonStyle}">Update</button><button id="previewDL" class="btn ghost">Download .html</button><label style="margin-left:auto" class="small">Auto <input id="previewAuto" type="checkbox" checked></label></div>
+      <textarea id="previewInput" rows="12"></textarea>
+      <div class="preview"><div class="label">Live Preview</div><iframe id="previewFrame" sandbox="allow-scripts allow-same-origin" style="height:var(--preview-height);width:100%;border:1px solid rgba(0,0,0,0.06);border-radius:6px"></iframe></div>
+    </div>`;
+  const input = $('#previewInput'), frame = $('#previewFrame');
+  function update(){ const content = input.value || '<h3 style="color:#999">No HTML</h3>'; try{ frame.srcdoc = content; } catch(e){ const d = frame.contentDocument || frame.contentWindow.document; d.open(); d.write(content); d.close(); } }
+  $('#previewUpdate').addEventListener('click', update);
+  $('#previewDL').addEventListener('click', ()=> { const c = input.value || ''; if(!c.trim()) return alert('No HTML'); downloadBlob(new Blob([c], { type:'text/html' }), `preview_${Date.now()}.html`); });
+  let t=null; input.addEventListener('input', ()=> { if(!$('#previewAuto').checked) return; if(t) clearTimeout(t); t = setTimeout(update, 350); });
+  input.value = `<!doctype html>\n<html>\n<head><meta charset="utf-8"><title>Preview</title><style>body{font-family:Inter,Arial;padding:16px;color:#222}</style></head>\n<body>\n<h1>Hello — Preview</h1>\n<p>Type HTML/CSS/JS and see it live.</p>\n</body>\n</html>`;
+  update();
+}
+
+/* PDF to Excel */
+function renderPdfToExcel() {
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Extract text and tables from PDF to Excel format. Each page becomes a separate sheet.</div>
+      <input type="file" id="pdfToExcelFile" accept="application/pdf">
+      <div class="controls"><button id="pdfToExcelRun" style="${smallButtonStyle}">Convert to Excel</button></div>
+      <div class="preview" id="pdfToExcelPreview">
+        <div class="label">Extracted Text Preview</div>
+        <div id="pdfToExcelPreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  
+  $('#pdfToExcelRun').addEventListener('click', async () => {
+    const f = $('#pdfToExcelFile').files && $('#pdfToExcelFile').files[0];
+    if (!f) return alert('Select a PDF file');
+    
+    try {
+      const buf = await f.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: buf });
+      const pdf = await loadingTask.promise;
+      
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      let previewText = '';
+      
+      // Extract text from each page
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        
+        // Create a worksheet from the text
+        const lines = pageText.split('\n').filter(line => line.trim());
+        const wsData = lines.map(line => [line]);
+        const ws = XLSX.utils.aoa_to_sheet([['Extracted Text'], ...wsData]);
+        
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, `Page ${i}`);
+        
+        // Add to preview
+        previewText += `Page ${i}:\n${pageText.substring(0, 500)}${pageText.length > 500 ? '...' : ''}\n\n`;
+      }
+      
+      // Generate Excel file
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      // Update preview
+      $('#pdfToExcelPreviewInner').innerHTML = `
+        <div style="margin-bottom: 12px;">
+          <textarea readonly style="width: 100%; height: 200px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.05); color: inherit;">${previewText}</textarea>
+        </div>
+        <div class="small">Extracted text from ${pdf.numPages} page(s)</div>
+        <div style="margin-top: 8px;">
+          <button id="pdfToExcelDL" style="${smallButtonStyle}">Download Excel File</button>
+        </div>
+      `;
+      
+      $('#pdfToExcelDL').addEventListener('click', () => {
+        downloadBlob(blob, `pdf_extracted_${Date.now()}.xlsx`);
+      });
+      
+    } catch (e) {
+      console.error(e);
+      alert('PDF to Excel conversion failed');
+    }
+  });
+}
+
+/* PDF to Word */
+function renderPdfToWord() {
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert PDF to Word document format. Text content will be extracted and formatted.</div>
+      <input type="file" id="pdfToWordFile" accept="application/pdf">
+      <div class="controls"><button id="pdfToWordRun" style="${smallButtonStyle}">Convert to Word</button></div>
+      <div class="preview" id="pdfToWordPreview">
+        <div class="label">Extracted Content Preview</div>
+        <div id="pdfToWordPreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  
+  $('#pdfToWordRun').addEventListener('click', async () => {
+    const f = $('#pdfToWordFile').files && $('#pdfToWordFile').files[0];
+    if (!f) return alert('Select a PDF file');
+    
+    try {
+      const buf = await f.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: buf });
+      const pdf = await loadingTask.promise;
+      
+      let fullText = '';
+      
+      // Extract text from all pages
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n\n';
+      }
+      
+      // Create HTML content for Word
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Converted from PDF</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+            h1 { color: #2c3e50; }
+            p { margin-bottom: 16px; }
+          </style>
+        </head>
+        <body>
+          <h1>Document converted from PDF</h1>
+          <div>${fullText.replace(/\n/g, '<br>')}</div>
+        </body>
+        </html>
+      `;
+      
+      // Create Word document (as HTML that can be opened in Word)
+      const blob = new Blob([htmlContent], { type: 'application/msword' });
+      
+      // Update preview
+      $('#pdfToWordPreviewInner').innerHTML = `
+        <div style="margin-bottom: 12px;">
+          <textarea readonly style="width: 100%; height: 200px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.05); color: inherit;">${fullText.substring(0, 1000)}${fullText.length > 1000 ? '...' : ''}</textarea>
+        </div>
+        <div class="small">Extracted ${fullText.length} characters from ${pdf.numPages} page(s)</div>
+        <div style="margin-top: 8px;">
+          <button id="pdfToWordDL" style="${smallButtonStyle}">Download Word Document</button>
+        </div>
+      `;
+      
+      $('#pdfToWordDL').addEventListener('click', () => {
+        downloadBlob(blob, `pdf_converted_${Date.now()}.doc`);
+      });
+      
+    } catch (e) {
+      console.error(e);
+      alert('PDF to Word conversion failed');
+    }
+  });
+}
+
+/* PDF to PowerPoint */
+function renderPdfToPowerPoint() {
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert PDF to PowerPoint presentation. Each PDF page becomes a slide.</div>
+      <input type="file" id="pdfToPptFile" accept="application/pdf">
+      <div class="controls"><button id="pdfToPptRun" style="${smallButtonStyle}">Convert to PowerPoint</button></div>
+      <div class="preview" id="pdfToPptPreview">
+        <div class="label">Presentation Preview</div>
+        <div id="pdfToPptPreviewInner" class="small">No preview</div>
+      </div>
+    </div>`;
+  
+  $('#pdfToPptRun').addEventListener('click', async () => {
+    const f = $('#pdfToPptFile').files && $('#pdfToPptFile').files[0];
+    if (!f) return alert('Select a PDF file');
+    
+    try {
+      const buf = await f.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: buf });
+      const pdf = await loadingTask.promise;
+      
+      // Create HTML content for PowerPoint (as HTML that can be opened in PowerPoint)
+      let pptContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Presentation from PDF</title>
+          <style>
+            .slide { 
+              page-break-after: always; 
+              width: 10in; 
+              height: 7.5in; 
+              padding: 1in; 
+              box-sizing: border-box;
+              font-family: Arial, sans-serif;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+            }
+            .slide-content { 
+              background: rgba(255,255,255,0.1); 
+              padding: 40px; 
+              border-radius: 10px;
+              backdrop-filter: blur(10px);
+              height: 100%;
+              box-sizing: border-box;
+            }
+            h1 { font-size: 36px; margin-bottom: 20px; }
+            p { font-size: 18px; line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+      `;
+      
+      // Extract text and create slides
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        
+        pptContent += `
+          <div class="slide">
+            <div class="slide-content">
+              <h1>Slide ${i}</h1>
+              <p>${pageText.substring(0, 500)}${pageText.length > 500 ? '...' : ''}</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      pptContent += `</body></html>`;
+      
+      // Create PowerPoint document (as HTML that can be opened in PowerPoint)
+      const blob = new Blob([pptContent], { type: 'application/vnd.ms-powerpoint' });
+      
+      // Update preview
+      $('#pdfToPptPreviewInner').innerHTML = `
+        <div style="margin-bottom: 12px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 12px;">
+            <h3 style="margin: 0 0 12px 0;">Sample Slide Preview</h3>
+            <p style="margin: 0; opacity: 0.9;">This is how your slides will look. Each PDF page becomes a separate slide.</p>
+          </div>
+        </div>
+        <div class="small">Created ${pdf.numPages} slide(s) from PDF</div>
+        <div style="margin-top: 8px;">
+          <button id="pdfToPptDL" style="${smallButtonStyle}">Download PowerPoint</button>
+        </div>
+      `;
+      
+      $('#pdfToPptDL').addEventListener('click', () => {
+        downloadBlob(blob, `presentation_${Date.now()}.ppt`);
+      });
+      
+    } catch (e) {
+      console.error(e);
+      alert('PDF to PowerPoint conversion failed');
+    }
+  });
+}
+
+/* Video Compressor (lightweight simulation) */
+function renderVideoCompressor(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Simulated compression with preview. For real re-encoding, request FFmpeg.wasm integration.</div>
+      <input type="file" id="videoFileInput" accept="video/*">
+      <div class="controls"><button id="videoSimBtn" style="${smallButtonStyle}">Simulate Compress</button></div>
+      <div class="preview"><div class="label">Video Preview</div><div id="videoCompressPreviewInner" class="small">No preview</div></div>
+    </div>`;
+  let originalFile = null, simulatedBlob = null;
+  $('#videoFileInput').addEventListener('change', e=> { originalFile = e.target.files && e.target.files[0]; if(originalFile){ $('#videoCompressPreviewInner').innerHTML = `<div class="small">Original: ${escapeHtml(originalFile.name)} — ${fmtBytes(originalFile.size)}</div><video controls src="${URL.createObjectURL(originalFile)}" style="max-height:var(--preview-height);border-radius:6px;margin-top:8px"></video>`; }});
+  $('#videoSimBtn').addEventListener('click', ()=> {
+    if(!originalFile) return alert('Select a video first');
+    // simulation: no re-encoding, just show original again with a note
+    simulatedBlob = originalFile;
+    $('#videoCompressPreviewInner').innerHTML += `<div style="margin-top:8px" class="small">Simulated compressed preview below:</div><video controls src="${URL.createObjectURL(simulatedBlob)}" style="max-height:var(--preview-height);border-radius:6px;margin-top:8px"></video>`;
+    alert('Simulated compression complete. Ask to integrate FFmpeg.wasm for real re-encoding.');
+  });
+}
+
+/* Audio Trimmer */
+function renderAudioTrimmer(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Upload audio (MP3/WAV/OGG). Select start/end seconds. Preview and download trimmed WAV.</div>
+      <input type="file" id="audioFileInput" accept="audio/*">
+      <div style="display:flex;gap:8px;margin-top:8px"><input type="number" id="audioStart" placeholder="Start (s)" step="0.1"><input type="number" id="audioEnd" placeholder="End (s)" step="0.1"></div>
+      <div class="controls"><button id="audioPreviewBtn" style="${smallButtonStyle}">Preview Selection</button><button id="audioTrimBtn" class="btn ghost">Trim & Download</button></div>
+      <div class="preview"><div class="label">Audio Preview</div><div id="audioPreviewInner" class="small">No audio loaded</div></div>
+    </div>`;
+  let audioBuffer=null, audioCtx=null, currentBlobUrl=null;
+  $('#audioFileInput').addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const ab = await f.arrayBuffer();
+      audioBuffer = await audioCtx.decodeAudioData(ab.slice(0));
+      $('#audioPreviewInner').innerHTML = `<div class="small">Loaded: ${escapeHtml(f.name)} — ${audioBuffer.duration.toFixed(2)} s</div>`;
+      $('#audioStart').value = 0; $('#audioEnd').value = audioBuffer.duration.toFixed(2);
+    } catch(err){ console.error(err); alert('Failed to decode audio'); }
+  });
+
+  $('#audioPreviewBtn').addEventListener('click', ()=>{
+    const s = parseFloat($('#audioStart').value||0), e = parseFloat($('#audioEnd').value||0);
+    if(!audioBuffer) return alert('Load audio first'); if(isNaN(s)||isNaN(e)||e<=s) return alert('Invalid start/end');
+    const wav = encodeWavFromSegment(audioBuffer, s, e);
+    if(currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+    currentBlobUrl = URL.createObjectURL(wav);
+    $('#audioPreviewInner').innerHTML = `<audio controls src="${currentBlobUrl}" style="width:100%;margin-top:8px"></audio><div class="small" style="margin-top:8px">Preview of ${s}–${e}s</div>`;
+  });
+
+  $('#audioTrimBtn').addEventListener('click', ()=>{
+    const s = parseFloat($('#audioStart').value||0), e = parseFloat($('#audioEnd').value||0);
+    if(!audioBuffer) return alert('Load audio first'); if(isNaN(s)||isNaN(e)||e<=s) return alert('Invalid start/end');
+    try{
+      const wav = encodeWavFromSegment(audioBuffer, s, e);
+      downloadBlob(wav, `trim_${Math.round(s)}-${Math.round(e)}.wav`);
+    } catch(err){ console.error(err); alert('Trim failed'); }
+  });
+
+  function encodeWavFromSegment(buffer, startSec, endSec){
+    const sampleRate = buffer.sampleRate;
+    const startSample = Math.floor(startSec * sampleRate);
+    const endSample = Math.min(buffer.length, Math.floor(endSec * sampleRate));
+    const segLen = endSample - startSample;
+    const numChannels = buffer.numberOfChannels;
+    const bytesPerSample = 2;
+    const blockAlign = numChannels * bytesPerSample;
+    const wavBuffer = new ArrayBuffer(44 + segLen * blockAlign);
+    const view = new DataView(wavBuffer);
+    let offset = 0;
+    function writeString(s){ for(let i=0;i<s.length;i++){ view.setUint8(offset++, s.charCodeAt(i)); } }
+    writeString('RIFF'); view.setUint32(offset, 36 + segLen * blockAlign, true); offset += 4;
+    writeString('WAVE'); writeString('fmt '); view.setUint32(offset, 16, true); offset += 4;
+    view.setUint16(offset, 1, true); offset += 2;
+    view.setUint16(offset, numChannels, true); offset += 2;
+    view.setUint32(offset, sampleRate, true); offset += 4;
+    view.setUint32(offset, sampleRate * blockAlign, true); offset += 4;
+    view.setUint16(offset, blockAlign, true); offset += 2;
+    view.setUint16(offset, 16, true); offset += 2;
+    writeString('data'); view.setUint32(offset, segLen * blockAlign, true); offset += 4;
+    let pos = offset;
+    for(let i=0;i<segLen;i++){
+      for(let ch=0; ch<numChannels; ch++){
+        const sample = buffer.getChannelData(ch)[startSample + i] || 0;
+        let s = Math.max(-1, Math.min(1, sample));
+        s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        view.setInt16(pos, Math.round(s), true); pos += 2;
+      }
+    }
+    return new Blob([view], { type: 'audio/wav' });
+  }
+}
+
+/* QR Generator */
+function renderQrGenerator(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Generate QR codes (PNG). Preview below.</div>
+      <input type="text" id="qrTextInput" placeholder="Text or URL">
+      <div class="controls"><button id="qrGenBtn" style="${smallButtonStyle}">Generate</button><button id="qrDlBtn" class="btn ghost">Download PNG</button></div>
+      <div class="preview"><div class="label">QR Preview</div><div id="qrArea" class="small">No QR</div></div>
+    </div>`;
+  $('#qrGenBtn').addEventListener('click', ()=> {
+    const t = $('#qrTextInput').value.trim(); if(!t) return alert('Enter text');
+    const container = $('#qrArea'); container.innerHTML = '';
+    new QRCode(container, { text: t, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.H });
+  });
+  $('#qrDlBtn').addEventListener('click', ()=> {
+    const c = $('#qrArea'); if(!c.innerHTML.trim()) return alert('Generate QR first');
+    const cvs = c.querySelector('canvas'); if(cvs){ cvs.toBlob(b=>downloadBlob(b, `qr_${Date.now()}.png`)); return; }
+    const img = c.querySelector('img'); if(img && img.src){ fetch(img.src).then(r=>r.blob()).then(b=>downloadBlob(b, `qr_${Date.now()}.png`)); return; }
+    alert('No QR to download');
+  });
+}
+
+/* QR Scanner */
+let html5Qr = null;
+function stopScanner(){ if(html5Qr){ html5Qr.stop().catch(()=>{}); try{ html5Qr.clear(); }catch(e){} html5Qr = null; } }
+function renderQrScanner(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Camera required (HTTPS / localhost). Live preview below.</div>
+      <div class="preview"><div class="label">Camera Preview</div><div id="qrReader" style="width:100%;max-width:480px;margin-top:12px"></div><div id="qrScanResult" style="margin-top:10px;font-weight:700"></div></div>
+      <div class="controls"><button id="qrStop" class="btn ghost">Stop</button></div>
+    </div>`;
+  const res = $('#qrScanResult');
+  try{
+    html5Qr = new Html5Qrcode("qrReader");
+    html5Qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+      (txt)=>{ res.textContent = 'Scanned: ' + txt; html5Qr.stop().catch(()=>{}); },
+      (err)=>{}
+    ).catch(err=>{ res.textContent = 'Camera error: ' + String(err); });
+  } catch(e){ res.textContent = 'Scanner init error: ' + String(e); }
+  $('#qrStop').addEventListener('click', ()=>{ if(html5Qr) html5Qr.stop().catch(()=>{}); res.textContent = 'Scanner stopped'; });
+}
+
+/* Text Case Converter */
+function renderTextCaseConverter(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Convert text to UPPER / lower / Title case and download. Preview below.</div>
+      <textarea id="caseInputTool" rows="8"></textarea>
+      <div class="controls"><button id="upperBtn" style="${smallButtonStyle}">UPPERCASE</button><button id="lowerBtn" class="btn ghost">lowercase</button><button id="titleBtn" class="btn ghost">Title Case</button><button id="caseDl" class="btn ghost">Download</button></div>
+      <div class="preview"><div class="label">Output Preview</div><textarea id="caseOutputTool" rows="8" readonly style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.06)"></textarea></div>
+    </div>`;
+  $('#upperBtn').addEventListener('click', ()=> { const t = $('#caseInputTool').value; if(!t) return alert('Enter text'); $('#caseOutputTool').value = t.toUpperCase(); });
+  $('#lowerBtn').addEventListener('click', ()=> { const t = $('#caseInputTool').value; if(!t) return alert('Enter text'); $('#caseOutputTool').value = t.toLowerCase(); });
+  $('#titleBtn').addEventListener('click', ()=> { const t = $('#caseInputTool').value; if(!t) return alert('Enter text'); $('#caseOutputTool').value = t.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); });
+  $('#caseDl').addEventListener('click', ()=> { const out = $('#caseOutputTool').value; if(!out) return alert('Convert first'); downloadBlob(new Blob([out],{type:'text/plain'}), `text_${Date.now()}.txt`); });
+}
+
+/* Video Cropper (lightweight) */
+function renderVideoCropper(){
+  $('#toolContent').innerHTML = `
+    <div>
+      <div class="small">Upload a video, draw a rectangular crop box on the preview, then record/export the cropped region as WebM. (Simple rectangular crop)</div>
+      <input type="file" id="videoCropFile" accept="video/*">
+      <div class="controls" style="margin-top:8px"><button id="vcStartRec" style="${smallButtonStyle}" disabled>Start Recording</button><button id="vcStopRec" class="btn ghost" disabled>Stop</button><button id="vcDownload" class="btn ghost" disabled>Download</button></div>
+      <div class="preview" id="vcPreviewArea"><div class="label">Video Preview & Crop</div>
+        <div id="videoCropWrap" style="position:relative;margin-top:8px;background:#111;display:flex;justify-content:center;align-items:center;min-height:var(--preview-height);border-radius:8px;overflow:hidden">
+          <video id="vcVideo" controls style="max-width:100%;display:block;"></video>
+        </div>
+        <div id="vcStatus" class="small" style="margin-top:8px">No video loaded</div>
+      </div>
+    </div>`;
+  const fileInput = $('#videoCropFile'), video = $('#vcVideo'), wrap = $('#videoCropWrap');
+  const startBtn = $('#vcStartRec'), stopBtn = $('#vcStopRec'), dlBtn = $('#vcDownload'), status = $('#vcStatus');
+  let cropBox = null;
+  let recordingBlob = null;
+  let recorder = null;
+  let drawLoop = false;
+  let captureCanvas = null;
+  let captureCtx = null;
+  let captureStream = null;
+
+  function clearOverlay(){
+    const old = wrap.querySelector('.crop-overlay');
+    if(old) old.remove();
+  }
+
+  fileInput.addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const url = URL.createObjectURL(f);
+    video.src = url; video.load();
+    status.textContent = 'Video loaded — draw crop rectangle on video preview.';
+    clearOverlay(); cropBox = null;
+    startBtn.disabled = true; stopBtn.disabled = true; dlBtn.disabled = true;
+    await new Promise(r=> video.onloadedmetadata = r);
+    setTimeout(()=> createOverlay(), 60);
+  });
+
+  function createOverlay(){
+    clearOverlay();
+    const rect = video.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const overlay = document.createElement('div');
+    overlay.className = 'crop-overlay';
+    overlay.style.left = (rect.left - wrapRect.left) + 'px';
+    overlay.style.top = (rect.top - wrapRect.top) + 'px';
+    overlay.style.width = rect.width + 'px';
+    overlay.style.height = rect.height + 'px';
+    overlay.style.pointerEvents = 'auto';
+    overlay.style.position = 'absolute';
+    overlay.style.boxSizing = 'border-box';
+    overlay.style.border = '2px dashed rgba(255,255,255,0.7)';
+    overlay.style.cursor = 'crosshair';
+    wrap.appendChild(overlay);
+
+    let drawing=false, startX=0, startY=0;
+    const box = document.createElement('div');
+    box.style.position='absolute'; box.style.border='2px solid #fff'; box.style.background='rgba(255,255,255,0.06)';
+    box.style.display='none'; overlay.appendChild(box);
+
+    overlay.addEventListener('mousedown', (ev)=>{
+      ev.preventDefault();
+      drawing = true;
+      const ox = ev.offsetX, oy = ev.offsetY;
+      startX = ox; startY = oy;
+      box.style.left = ox + 'px'; box.style.top = oy + 'px'; box.style.width = '0px'; box.style.height='0px'; box.style.display='block';
+    });
+    overlay.addEventListener('mousemove', (ev)=>{
+      if(!drawing) return;
+      const ox = ev.offsetX, oy = ev.offsetY;
+      const x = Math.min(startX, ox), y = Math.min(startY, oy);
+      const w = Math.abs(ox - startX), h = Math.abs(oy - startY);
+      box.style.left = x + 'px'; box.style.top = y + 'px'; box.style.width = w + 'px'; box.style.height = h + 'px';
+    });
+    overlay.addEventListener('mouseup', (ev)=>{
+      drawing = false;
+      const ox = ev.offsetX, oy = ev.offsetY;
+      const x = Math.min(startX, ox), y = Math.min(startY, oy);
+      const w = Math.abs(ox - startX), h = Math.abs(oy - startY);
+      if(w < 10 || h < 10){ box.style.display='none'; cropBox = null; status.textContent = 'Crop too small — draw a larger rectangle.'; startBtn.disabled = true; return; }
+      const ovRect = overlay.getBoundingClientRect();
+      const scaleX = video.videoWidth / ovRect.width, scaleY = video.videoHeight / ovRect.height;
+      const relX = Math.round(x * scaleX), relY = Math.round(y * scaleY), relW = Math.round(w * scaleX), relH = Math.round(h * scaleY);
+      cropBox = { x: relX, y: relY, w: relW, h: relH };
+      status.textContent = `Crop set (${cropBox.w}×${cropBox.h}) — press Start Recording to export cropped video.`;
+      startBtn.disabled = false;
+    });
+
+    window.addEventListener('resize', () => {
+      const rect = video.getBoundingClientRect();
+      overlay.style.left = (rect.left - wrapRect.left) + 'px';
+      overlay.style.top = (rect.top - wrapRect.top) + 'px';
+      overlay.style.width = rect.width + 'px';
+      overlay.style.height = rect.height + 'px';
+    });
+  }
+
+  startBtn.addEventListener('click', ()=>{
+    if(!cropBox) return alert('Set crop area first');
+    if(video.paused){ if(confirm('Video is paused. Start playback automatically?')) video.play(); else return; }
+    captureCanvas = document.createElement('canvas');
+    captureCanvas.width = cropBox.w;
+    captureCanvas.height = cropBox.h;
+    captureCtx = captureCanvas.getContext('2d');
+    drawLoop = true;
+    function drawFrame(){
+      if(!drawLoop) return;
+      try{
+        captureCtx.drawImage(video, cropBox.x, cropBox.y, cropBox.w, cropBox.h, 0, 0, captureCanvas.width, captureCanvas.height);
+      } catch(e){}
+      requestAnimationFrame(drawFrame);
+    }
+    drawFrame();
+    captureStream = captureCanvas.captureStream(30);
+    recordingBlob = null;
+    let options = { mimeType: 'video/webm; codecs=vp9' };
+    try{ recorder = new MediaRecorder(captureStream, options); } catch(e){ try{ recorder = new MediaRecorder(captureStream); } catch(err){ alert('MediaRecorder not supported'); return; } }
+    const chunks = [];
+    recorder.ondataavailable = (ev) => { if(ev.data && ev.data.size) chunks.push(ev.data); };
+    recorder.onstop = () => {
+      recordingBlob = new Blob(chunks, { type: 'video/webm' });
+      dlBtn.disabled = false; stopBtn.disabled = true; startBtn.disabled = false; status.textContent = `Recording saved (${fmtBytes(recordingBlob.size)}). Click Download.`;
+      $('#vcPreviewArea').insertAdjacentHTML('beforeend', `<div style="margin-top:8px" class="small">Cropped preview:</div><video controls style="width:100%;max-height:240px;border-radius:6px;margin-top:8px" src="${URL.createObjectURL(recordingBlob)}"></video>`);
+    };
+    recorder.start();
+    startBtn.disabled = true; stopBtn.disabled = false; dlBtn.disabled = true;
+    status.textContent = 'Recording... click Stop when done';
+  });
+
+  stopBtn.addEventListener('click', ()=>{
+    if(recorder && recorder.state === 'recording') recorder.stop();
+    drawLoop = false;
+    if(captureStream){ captureStream.getTracks().forEach(t=>t.stop()); captureStream = null; }
+  });
+
+  dlBtn.addEventListener('click', ()=> { if(!recordingBlob) return alert('No recording'); downloadBlob(recordingBlob, `cropped_${Date.now()}.webm`); });
+}
+
+/* --------------------- END TOOLS --------------------- */
+
+/* initial view */
+showDashboard();
+
+/* delegate card clicks */
+document.addEventListener('click', function(e){
+  const card = e.target.closest('.card');
+  if(card && card.dataset && card.dataset.tool){
+    if(e.target.classList.contains('open') || e.detail === 2 || e.target.closest('.card')) openTool(card.dataset.tool);
+  }
+});
+</script>
+</body>
+</html>
